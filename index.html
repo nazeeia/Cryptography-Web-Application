@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101512">
+  <meta name="description" content="Demo interaktif XOR Stream Cipher dan One-Time Pad untuk presentasi kelas.">
+  <title>XOR Lab — Stream Cipher & One-Time Pad</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="shell topbar">
+    <a class="brand" href="#home"><span class="brand-mark">⊕</span><span>XOR LAB<small>CRYPTOGRAPHY MINI PROJECT</small></span></a>
+    <nav class="nav" aria-label="Navigasi utama" role="tablist"><button type="button" data-view="enc-panel" aria-selected="true">Enkripsi</button><button type="button" data-view="dec-panel" aria-selected="false">Dekripsi</button><button type="button" data-view="tests" aria-selected="false">Test case</button><button type="button" data-view="reuse" aria-selected="false">Serangan: key reuse</button><button type="button" data-view="otp" aria-selected="false">Syarat OTP</button></nav>
+    <span class="status">INTERACTIVE DEMO</span>
+  </header>
+  <main>
+    <section class="shell hero" id="home">
+      <div><div class="eyebrow">Stream cipher · One-time pad</div><h1>Satu operasi.<br><span>Dua arah.</span></h1><p>Pelajari cara XOR mengubah plaintext menjadi ciphertext, lalu mengembalikannya dengan keystream yang sama. Coba juga apa yang terjadi saat keystream dipakai ulang.</p></div>
+      <div class="flow-card" aria-label="Diagram alur XOR"><div class="flow-label">XOR ENCRYPTION FLOW</div><div class="flow-line"><div class="flow-node"><strong>PLAINTEXT</strong><small>pesan asli</small></div><div class="flow-xor">⊕</div><div class="flow-node"><strong>KEYSTREAM</strong><small>kunci aliran</small></div><span class="arrow">→</span><div class="flow-node"><strong>CIPHERTEXT</strong><small>pesan sandi</small></div></div><div class="flow-note">Dekripsi memakai XOR yang sama: ciphertext ⊕ keystream = plaintext.</div></div>
+    </section>
+    <section class="shell workspace view-panel active" id="enc-panel">
+      <div class="section-head"><div><div class="eyebrow">01 / Coba sendiri</div><h2>Enkripsi & dekripsi</h2></div><p>Gunakan karakter ASCII dan keystream sepanjang pesan. Ciphertext ditulis sebagai byte heksadesimal agar setiap hasil XOR terlihat jelas.</p></div>
+      <div class="tab-panel active" id="enc-work-panel" role="tabpanel">
+        <div class="tool-grid"><article class="card"><h3>Enkripsi pesan</h3><p class="sub">Plaintext ⊕ keystream menghasilkan ciphertext.</p>
+          <div class="field"><label for="plain">Plaintext <span id="plain-count">0 karakter</span></label><textarea id="plain" placeholder="Contoh: HELLO" spellcheck="false"></textarea><p class="help">Karakter ASCII saja (kode 0–127). Spasi diperbolehkan.</p></div>
+          <div class="field"><label for="stream">Keystream <span id="stream-count">0 karakter</span></label><input id="stream" placeholder="Masukkan keystream, misalnya ABCDE" spellcheck="false"><p class="help">Panjang keystream harus sama dengan plaintext. Demo ini tidak mengulang kunci otomatis.</p></div>
+          <div class="actions"><button class="btn primary" id="encrypt-btn">Enkripsi <span aria-hidden="true">→</span></button><button class="btn secondary" id="send-to-decrypt">Kirim ke dekripsi</button><button class="btn secondary" id="fill-example">Isi contoh</button></div><div class="message" id="enc-message" role="status" aria-live="polite"></div>
+        </article><article class="card"><h3>Hasil & langkah XOR</h3><p class="sub">Setiap pasangan byte digabungkan dengan operasi XOR.</p><div class="result"><div class="result-head"><span>CIPHERTEXT · HEX</span><button class="btn secondary" id="copy-cipher" style="padding:5px 8px;font-size:10px">Salin</button></div><div class="result-value" id="enc-result">—</div></div><div class="steps" id="enc-steps"><div class="empty-state">Hasil langkah akan muncul di sini setelah enkripsi.</div></div></article></div>
+      </div>
+    </section>
+    <section class="shell workspace view-panel" id="dec-panel">
+      <div class="section-head"><div><div class="eyebrow">01 / Coba sendiri</div><h2>Enkripsi & dekripsi</h2></div><p>XOR dengan keystream yang sama mengembalikan pesan asli.</p></div>
+      <div class="tab-panel active" id="dec-work-panel" role="tabpanel">
+        <div class="tool-grid"><article class="card"><h3>Dekripsi pesan</h3><p class="sub">Ciphertext ⊕ keystream yang sama menghasilkan plaintext.</p>
+          <div class="field"><label for="cipher-input">Ciphertext <span>format hex</span></label><textarea id="cipher-input" placeholder="Misalnya: 09 07 0F 08 0A" spellcheck="false"></textarea><p class="help">Byte heksadesimal dipisahkan spasi boleh atau tanpa pemisah (contoh: 09070F).</p></div>
+          <div class="field"><label for="dec-stream">Keystream <span id="dec-stream-count">0 karakter</span></label><input id="dec-stream" placeholder="Masukkan keystream yang sama" spellcheck="false"><p class="help">Panjang keystream harus sama dengan jumlah byte ciphertext.</p></div>
+          <div class="actions"><button class="btn primary" id="decrypt-btn">Dekripsi <span aria-hidden="true">→</span></button></div><div class="message" id="dec-message" role="status" aria-live="polite"></div>
+        </article><article class="card"><h3>Hasil & langkah XOR</h3><p class="sub">Karena XOR adalah operasi yang dapat membalik dirinya sendiri.</p><div class="result"><div class="result-head"><span>PLAINTEXT · ASCII</span><button class="btn secondary" id="copy-plain" style="padding:5px 8px;font-size:10px">Salin</button></div><div class="result-value" id="dec-result">—</div></div><div class="steps" id="dec-steps"><div class="empty-state">Hasil langkah akan muncul di sini setelah dekripsi.</div></div></article></div>
+      </div>
+    </section>
+    <section class="shell attack view-panel" id="reuse">
+      <div class="section-head attack-intro"><div><div class="eyebrow">02 / Demo kelemahan</div><h2>Keystream reuse</h2></div><p>Dua pesan dienkripsi memakai keystream identik dengan panjang yang sama. Amati XOR antara kedua ciphertext.</p></div>
+      <div class="attack-grid"><article class="card"><h3>Pesan dengan keystream yang sama</h3><p class="sub">Ubah kedua pesan dan keystream untuk melihat efeknya.</p>
+        <div class="field"><label for="msg-one">Pesan 1</label><input id="msg-one" value="MEET AT NOON" spellcheck="false"></div><div class="field"><label for="msg-two">Pesan 2</label><input id="msg-two" value="SEND THE GOLD" spellcheck="false"></div><div class="field"><label for="reuse-key">Keystream yang dipakai ulang</label><input id="reuse-key" value="XMCKL QWERTYU" spellcheck="false"><p class="help">Demo ini menyamakan panjang pesan secara otomatis dengan spasi di akhir pesan yang lebih pendek.</p></div><button class="btn primary" id="reuse-btn">Jalankan demo reuse</button><div class="message" id="reuse-message" role="status" aria-live="polite"></div>
+      </article><article class="card"><h3>Apa yang terlihat penyerang?</h3><p class="sub">Identitas matematis: (P₁ ⊕ K) ⊕ (P₂ ⊕ K) = P₁ ⊕ P₂.</p><div class="equation"><div class="eq-box"><small>CIPHERTEXT 1 · HEX</small><code id="c1">—</code></div><span class="eq-op">⊕</span><div class="eq-box"><small>CIPHERTEXT 2 · HEX</small><code id="c2">—</code></div></div><div class="attack-result"><small>CIPHERTEXT 1 ⊕ CIPHERTEXT 2 = PLAINTEXT 1 ⊕ PLAINTEXT 2</small><code id="reuse-xor">—</code><p id="reuse-ascii">ASCII hasil XOR plaintext: —</p></div><div class="callout">Hasil XOR tidak langsung mengungkap kedua pesan. Namun, pola bahasa atau satu pesan yang diketahui dapat membantu menebak pesan lainnya.</div></article></div>
+    </section>
+    <section class="shell tests view-panel" id="tests">
+      <div class="section-head"><div><div class="eyebrow">03 / Periksa implementasi</div><h2>Test cases</h2></div><p>Tiga pasangan input dan ciphertext yang sudah diketahui. Klik tombol untuk menjalankan semuanya dan membandingkan output aktual dengan hasil yang diharapkan.</p></div>
+      <div class="test-list" id="test-list"></div><div class="test-actions"><button class="btn primary" id="run-tests">Jalankan semua test</button><span class="summary" id="test-summary" aria-live="polite">Belum dijalankan.</span></div>
+    </section>
+    <section class="shell otp view-panel" id="otp">
+      <div class="section-head"><div><div class="eyebrow">04 / One-Time Pad</div><h2>Syarat OTP yang aman</h2></div><p>OTP memiliki kerahasiaan sempurna secara teori hanya jika semua syarat pentingnya terpenuhi.</p></div>
+      <div class="otp-grid"><div class="otp-copy"><p>OTP mengenkripsi dengan XOR seperti demo di atas. Perbedaan utamanya adalah kualitas dan penggunaan kuncinya: keystream harus acak sungguhan dan hanya boleh dipakai sekali.</p><div class="callout">Jika keystream tidak acak, lebih pendek dari pesan, bocor, atau digunakan ulang, jaminan OTP tidak berlaku.</div></div><div><div class="checklist"><div class="check"><i>✓</i><span>Kunci benar-benar acak</span></div><div class="check"><i>✓</i><span>Kunci minimal sepanjang pesan</span></div><div class="check"><i>✓</i><span>Kunci dijaga tetap rahasia</span></div><div class="check"><i>✓</i><span>Kunci tidak pernah digunakan ulang</span></div></div><p class="otp-foot">Di demo ini, keystream dimasukkan secara manual untuk pembelajaran. Website tidak membuat atau menyimpan kunci rahasia.</p></div></div>
+    </section>
+  </main>
+  <footer class="shell footer"><span>XOR LAB · Mini project kriptografi</span><span>ASCII → byte → XOR → <code>HEX</code></span></footer>
+  <script src="script.js" defer></script>
+</body>
+</html>
+
