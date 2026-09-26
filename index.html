@@ -3,96 +3,160 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>XOR Stream Cipher & One-Time Pad</title>
+<title>XOR Stream Cipher & One-Time Pad — Lab Kriptografi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<main>
-<div class="top">
-<div>
-<h1>XOR Stream Cipher &amp; One-Time Pad</h1>
-<p class="mu" style="margin:0">Plaintext ⊕ Keystream = Ciphertext. Operasi yang sama membuka kembali pesan.</p>
-</div>
-<label style="margin:0;min-width:260px">Mode kunci
-<select id="mode">
-<option value="stream">Stream cipher (kunci pendek diulang)</option>
-<option value="otp">One-Time Pad (kunci ≥ panjang pesan)</option>
-</select></label>
-</div>
 
-<div class="tabs" role="tablist" id="tabs">
-<button role="tab" data-t="enc" aria-selected="true">Enkripsi</button>
-<button role="tab" data-t="dec" aria-selected="false">Dekripsi</button>
-<button role="tab" data-t="test" aria-selected="false">Test case</button>
-<button role="tab" data-t="atk" aria-selected="false">Serangan: kunci dipakai ulang</button>
-<button role="tab" data-t="otp" aria-selected="false">Syarat OTP</button>
-</div>
+<header class="mast">
+  <div class="mast-in">
+    <span class="mast-label">Lab Kriptografi &nbsp;·&nbsp; Modul XOR</span>
+    <label class="mode-field">Mode kunci
+      <select id="mode">
+        <option value="stream">Stream cipher — kunci pendek, diulang</option>
+        <option value="otp">One-Time Pad — kunci ≥ panjang pesan</option>
+      </select>
+    </label>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-in">
+    <p class="hero-kicker">XOR encryption</p>
+    <h1 class="hero-title">One Message. One Keystream. One XOR.</h1>
+    <p class="hero-sub">See how plaintext becomes ciphertext, one bit at a time.</p>
+    <div class="hero-eq" aria-hidden="true">
+      <div class="eq-item">
+        <span class="eq-tag">Plaintext</span>
+        <span class="eq-word" id="heroWord">SANDI</span>
+      </div>
+      <span class="eq-op">⊕</span>
+      <div class="eq-item">
+        <span class="eq-tag">Keystream</span>
+        <span class="eq-word eq-key">KUNCI</span>
+      </div>
+      <span class="eq-arrow">=</span>
+      <div class="eq-item">
+        <span class="eq-tag">Ciphertext</span>
+        <span class="eq-word eq-cipher" id="heroCipher">83 1B 06 08 07</span>
+      </div>
+    </div>
+    <p class="hero-invite">See the bit by bit steps in the Enkripsi tab below.</p>
+  </div>
+</section>
+
+<nav class="tabs" role="tablist" id="tabs">
+  <button role="tab" data-t="enc" aria-selected="true"><span class="tab-n">Enkripsi</span></button>
+  <button role="tab" data-t="dec" aria-selected="false"><span class="tab-n">Dekripsi</span></button>
+  <button role="tab" data-t="test" aria-selected="false"><span class="tab-n">Test case</span></button>
+  <button role="tab" data-t="atk" aria-selected="false"><span class="tab-n">Serangan</span></button>
+  <button role="tab" data-t="otp" aria-selected="false"><span class="tab-n">Syarat OTP</span></button>
+</nav>
+
+<main class="sheet">
 
 <section id="enc" class="pane on">
-<div class="card">
-<h2>Enkripsi</h2>
-<p class="mu">Setiap karakter diubah ke kode ASCII 8-bit, lalu di-XOR dengan byte kunci pada posisi yang sama. Hasil ditampilkan dalam hex karena byte hasil XOR sering bukan karakter yang bisa dibaca.</p>
-<label>Plaintext<input id="pt" class="mono" value="SANDI RAHASIA" autocomplete="off"></label>
-<label>Kunci<input id="k1" class="mono" value="kunci-XOR-123" autocomplete="off"></label>
-<div class="row">
-<button class="btn pri" id="be">Enkripsi</button>
-<button class="btn" id="gen">🎲 Buat kunci acak</button>
-<button class="btn" id="send">Kirim ke Dekripsi</button>
-</div>
-<div id="o1"></div>
-</div>
-<div class="card"><h2>Langkah per karakter</h2><p class="mu">Kotak terisi = bit 1, kosong = bit 0. Bit hasil bernilai 1 hanya jika kedua bit di atasnya berbeda.</p><div id="v1" class="sc"><p class="mu">Klik “Enkripsi” untuk melihat langkahnya.</p></div></div>
+  <div class="panel">
+    <aside class="note">
+      <h2>Enkripsi</h2>
+      <p>Tiap karakter menjadi kode ASCII 8-bit, lalu di-XOR dengan byte kunci pada posisi yang sama. Hasilnya jarang berupa huruf yang terbaca, jadi ditulis dalam hex.</p>
+    </aside>
+    <div class="field-col">
+      <label>Plaintext<input id="pt" class="mono" value="SANDI RAHASIA" autocomplete="off"></label>
+      <label>Kunci<input id="k1" class="mono" value="kunci-XOR-123" autocomplete="off"></label>
+      <div class="row">
+        <button class="btn pri" id="be">⊕ Enkripsi</button>
+        <button class="btn" id="gen">Buat kunci acak</button>
+        <button class="btn" id="send">Kirim ke Dekripsi →</button>
+      </div>
+      <div id="o1"></div>
+    </div>
+  </div>
+  <div class="panel">
+    <aside class="note">
+      <h2>Langkah per karakter</h2>
+      <p>Lubang terisi adalah bit 1, cincin kosong adalah bit 0. Bit hasil bernilai 1 hanya ketika dua bit di atasnya berbeda.</p>
+    </aside>
+    <div id="v1" class="sc field-col"><p class="mu">Klik “Enkripsi” untuk melihat langkahnya.</p></div>
+  </div>
 </section>
 
 <section id="dec" class="pane">
-<div class="card">
-<h2>Dekripsi</h2>
-<p class="mu">Masukkan ciphertext dalam hex dan kunci yang sama. XOR dengan keystream yang sama mengembalikan plaintext.</p>
-<label>Ciphertext (hex)<input id="ct" class="mono" placeholder="mis. 3A0F1C" autocomplete="off"></label>
-<label>Kunci<input id="k2" class="mono" autocomplete="off"></label>
-<div class="row"><button class="btn pri" id="bd">Dekripsi</button></div>
-<div id="o2"></div>
-</div>
-<div class="card"><h2>Langkah per karakter</h2><div id="v2" class="sc"><p class="mu">Klik “Dekripsi” untuk melihat langkahnya.</p></div></div>
+  <div class="panel">
+    <aside class="note">
+      <h2>Dekripsi</h2>
+      <p>Ciphertext dalam hex, di-XOR ulang dengan kunci yang sama seperti saat mengenkripsi, mengembalikan plaintext.</p>
+    </aside>
+    <div class="field-col">
+      <label>Ciphertext (hex)<input id="ct" class="mono" placeholder="mis. 3A0F1C" autocomplete="off"></label>
+      <label>Kunci<input id="k2" class="mono" autocomplete="off"></label>
+      <div class="row"><button class="btn pri" id="bd">⊕ Dekripsi</button></div>
+      <div id="o2"></div>
+    </div>
+  </div>
+  <div class="panel">
+    <aside class="note"><h2>Langkah per karakter</h2></aside>
+    <div id="v2" class="sc field-col"><p class="mu">Klik “Dekripsi” untuk melihat langkahnya.</p></div>
+  </div>
 </section>
 
 <section id="test" class="pane">
-<div class="card">
-<h2>Test case</h2>
-<p class="mu">Data di sini sengaja berbeda dari contoh soal. Sebuah kasus <b>PASS</b> jika enkripsi sama dengan hasil yang diharapkan <i>dan</i> dekripsinya kembali ke plaintext awal. Kasus 4 menguji kunci yang lebih pendek (diulang).</p>
-<div class="row" style="margin-bottom:10px"><button class="btn pri" id="bt">Jalankan ulang</button></div>
-<div id="tsum"></div>
-<div class="sc"><table><thead><tr><th>#</th><th>Input</th><th>Algoritma</th><th>Output kamu</th><th>Output diharapkan</th><th>Status</th></tr></thead><tbody id="tb"></tbody></table></div>
-</div>
+  <div class="panel">
+    <aside class="note">
+      <h2>Test case</h2>
+      <p>Data di sini berbeda dari contoh soal. Sebuah kasus lulus jika hasil enkripsi cocok dengan yang diharapkan, dan dekripsinya kembali ke plaintext awal.</p>
+    </aside>
+    <div class="field-col">
+      <div class="row"><button class="btn pri" id="bt">Jalankan test case</button></div>
+      <div id="tsum"></div>
+      <div class="sc"><table><thead><tr><th>#</th><th>Input</th><th>Algoritma</th><th>Output kamu</th><th>Diharapkan</th><th>Status</th></tr></thead>
+      <tbody id="tb"><tr><td colspan="6" class="mu">Belum dijalankan. Klik “Jalankan test case” untuk memulai.</td></tr></tbody></table></div>
+    </div>
+  </div>
 </section>
 
 <section id="atk" class="pane">
-<div class="card">
-<h2>Serangan: keystream dipakai dua kali</h2>
-<p class="mu">Dua pesan dienkripsi dengan kunci yang sama. Penyerang hanya memegang C1 dan C2, tetapi C1 ⊕ C2 = (M1 ⊕ K) ⊕ (M2 ⊕ K) = M1 ⊕ M2. Kunci saling menghilang.</p>
-<label>Pesan 1<input id="m1" class="mono" value="SEND MONEY NOW" autocomplete="off"></label>
-<label>Pesan 2<input id="m2" class="mono" value="HOLD POSITION!" autocomplete="off"></label>
-<label>Kunci yang sama untuk keduanya<input id="ka" class="mono" value="kunciRAHASIA!!" autocomplete="off"></label>
-<div class="row"><button class="btn pri" id="ba">Jalankan serangan</button></div>
-<div id="oa"></div>
-</div>
-<div class="card">
-<h2>Tebak kata (crib dragging)</h2>
-<p class="mu">Setelah punya M1 ⊕ M2, penyerang menebak sepotong kata di Pesan 1 lalu menggesernya. Tebakan yang tepat membuat potongan Pesan 2 muncul sebagai teks yang bisa dibaca.</p>
-<label>Tebakan kata di Pesan 1<input id="cr" class="mono" value="SEND " autocomplete="off"></label>
-<div class="row"><button class="btn pri" id="bc">Geser tebakan</button></div>
-<div id="oc"></div>
-</div>
+  <div class="panel">
+    <aside class="note">
+      <h2>Kunci dipakai dua kali</h2>
+      <p>Dua pesan, satu kunci. C1 ⊕ C2 sama dengan M1 ⊕ M2 — kunci saling menghilang, dan yang tersisa adalah hubungan langsung antar pesan.</p>
+    </aside>
+    <div class="field-col">
+      <label>Pesan 1<input id="m1" class="mono" value="SEND MONEY NOW" autocomplete="off"></label>
+      <label>Pesan 2<input id="m2" class="mono" value="HOLD POSITION!" autocomplete="off"></label>
+      <label>Kunci yang sama untuk keduanya<input id="ka" class="mono" value="kunciRAHASIA!!" autocomplete="off"></label>
+      <div class="row"><button class="btn pri" id="ba">Jalankan serangan</button></div>
+      <div id="oa"><p class="mu">Belum dijalankan. Klik “Jalankan serangan” untuk memulai.</p></div>
+    </div>
+  </div>
+  <div class="panel">
+    <aside class="note">
+      <h2>Tebak kata (crib dragging)</h2>
+      <p>Sebuah tebakan kata di Pesan 1 digeser di sepanjang M1 ⊕ M2. Tebakan yang tepat membuat potongan Pesan 2 muncul sebagai teks yang bisa dibaca.</p>
+    </aside>
+    <div class="field-col">
+      <label>Tebakan kata di Pesan 1<input id="cr" class="mono" value="SEND " autocomplete="off"></label>
+      <div class="row"><button class="btn pri" id="bc">Geser tebakan</button></div>
+      <div id="oc"></div>
+    </div>
+  </div>
 </section>
 
 <section id="otp" class="pane">
-<div class="card">
-<h2>Empat syarat One-Time Pad</h2>
-<p class="mu">Status di bawah mengikuti enkripsi terakhir yang kamu jalankan di tab Enkripsi. Bila keempatnya terpenuhi, ciphertext tidak membocorkan apa pun tentang pesan selain panjangnya (perfect secrecy).</p>
-<div class="g2" id="otpc"></div>
-</div>
+  <div class="panel">
+    <aside class="note">
+      <h2>Empat syarat One-Time Pad</h2>
+      <p>Status mengikuti enkripsi terakhir di tab Enkripsi. Bila keempatnya terpenuhi, ciphertext tidak membocorkan apa pun tentang pesan selain panjangnya.</p>
+    </aside>
+    <div class="g2" id="otpc"></div>
+  </div>
 </section>
+
 </main>
+
+<footer class="foot">Kelompok XOR Stream Cipher &amp; One-Time Pad — dibangun untuk demonstrasi kelas.</footer>
 
 <script src="script.js"></script>
 </body>

@@ -83,30 +83,43 @@ const T=[
  {p:'OTP',k:'Zq9',x:'152569'},
  {p:'ATTACK',k:'AB',x:'001615030209'}];
 function runTests(){
+  const btn=$('bt');btn.disabled=true;btn.textContent='Menjalankan…';
+  $('tb').innerHTML='';$('tsum').innerHTML='';
   let ok=0;
-  $('tb').innerHTML=T.map((t,i)=>{
+  T.forEach((t,i)=>setTimeout(()=>{
     const out=toHex(xor(bytes(t.p),bytes(t.k)));
     const back=xor(t.x.match(/../g).map(h=>parseInt(h,16)),bytes(t.k)).map(pr).join('');
     const pass=out===t.x&&back===t.p;if(pass)ok++;
-    return `<tr><td>${i+1}</td><td class="m">P: ${esc(t.p)}<br>K: ${esc(t.k)}</td><td>ASCII → XOR<br>tiap byte kunci</td><td class="m">${out}</td><td class="m">${t.x}</td><td><span class="${pass?'pass':'fail'}">${pass?'PASS':'FAIL'}</span></td></tr>`}).join('');
-  $('tsum').innerHTML=`<div class="msg ${ok===T.length?'ok':'er'}">${ok===T.length?'✅':'❌'} ${ok} dari ${T.length} test case lulus.</div>`;
+    $('tb').insertAdjacentHTML('beforeend',`<tr><td>${i+1}</td><td class="m">P: ${esc(t.p)}<br>K: ${esc(t.k)}</td><td>ASCII → XOR<br>tiap byte kunci</td><td class="m">${out}</td><td class="m">${t.x}</td><td><span class="${pass?'pass':'fail'}">${pass?'PASS':'FAIL'}</span></td></tr>`);
+    if(i===T.length-1){
+      $('tsum').innerHTML=`<div class="msg ${ok===T.length?'ok':'er'}">${ok===T.length?'✅':'❌'} ${ok} dari ${T.length} test case lulus.</div>`;
+      btn.disabled=false;btn.textContent='Jalankan ulang';
+    }
+  },500*(i+1)));
 }
 $('bt').onclick=runTests;
 
 /* Serangan */
 let X=null;
 $('ba').onclick=()=>{
-  const m1=$('m1').value,m2=$('m2').value,k=$('ka').value,o=$('oa');
+  const m1=$('m1').value,m2=$('m2').value,k=$('ka').value,o=$('oa'),btn=$('ba');
   const e=chk(m1,'Pesan 1')||chk(m2,'Pesan 2')||chk(k,'Kunci');
   if(e){err(o,e);X=null;return}
   const n=Math.min(m1.length,m2.length),b1=bytes(m1).slice(0,n),b2=bytes(m2).slice(0,n),kb=bytes(k);
   const c1=xor(b1,kb),c2=xor(b2,kb);X=c1.map((v,i)=>v^c2[i]);
   const mx=b1.map((v,i)=>v^b2[i]),same=toHex(X)===toHex(mx);
-  const r=(l,v,c)=>`<div class="res"><small>${l}</small><code>${v}</code></div>`;
-  o.innerHTML=(m1.length!==m2.length?`<div class="msg wa">Panjang pesan berbeda, hanya ${n} karakter pertama yang dipakai.</div>`:'')+
-   r('C1 = M1 ⊕ K (dilihat penyerang)',toHex(c1))+r('C2 = M2 ⊕ K (dilihat penyerang)',toHex(c2))+
-   `<div class="eq">C1 ⊕ C2</div>`+r('Dihitung dari ciphertext saja',toHex(X))+r('M1 ⊕ M2 (dihitung dari plaintext, pembanding)',toHex(mx))+
-   `<div class="msg ${same?'ok':'er'}">${same?'✅ Sama persis. Kunci hilang dari persamaan, dan yang tersisa adalah hubungan langsung antara kedua pesan.':'❌ Hasil berbeda.'}</div>`;
+  const r=(l,v)=>`<div class="res"><small>${l}</small><code>${v}</code></div>`;
+  const steps=[
+    (m1.length!==m2.length?`<div class="msg wa">Panjang pesan berbeda, hanya ${n} karakter pertama yang dipakai.</div>`:'')+
+     `<p><b>Langkah 1.</b> Kedua pesan dienkripsi dengan kunci yang sama. Penyerang hanya melihat C1 dan C2.</p>`+r('C1 = M1 ⊕ K',toHex(c1))+r('C2 = M2 ⊕ K',toHex(c2)),
+    `<p><b>Langkah 2.</b> Penyerang meng-XOR kedua ciphertext tanpa perlu tahu kunci.</p><div class="eq">C1 ⊕ C2</div>`+r('Hasil dari ciphertext saja',toHex(X)),
+    `<p><b>Langkah 3.</b> Bandingkan dengan M1 ⊕ M2 yang dihitung dari plaintext.</p>`+r('M1 ⊕ M2',toHex(mx)),
+    `<div class="msg ${same?'ok':'er'}">${same?'✅ Sama persis. Kunci hilang dari persamaan, dan yang tersisa adalah hubungan langsung antara kedua pesan. Lanjutkan ke bagian tebak kata di bawah.':'❌ Hasil berbeda.'}</div>`];
+  o.innerHTML='';btn.disabled=true;btn.textContent='Menjalankan…';
+  steps.forEach((s,i)=>setTimeout(()=>{
+    o.insertAdjacentHTML('beforeend',s);
+    if(i===steps.length-1){btn.disabled=false;btn.textContent='Jalankan ulang'}
+  },700*i));
 };
 $('bc').onclick=()=>{
   const c=$('cr').value,o=$('oc');
@@ -135,4 +148,4 @@ function otpRender(){
      !s?wait:s.reuse?B('er','✗ Kunci ini sudah dipakai untuk pesan lain.'):B('ok','✓ Belum pernah dipakai untuk pesan lain di sesi ini.')]];
   $('otpc').innerHTML=items.map(i=>`<div class="card"><h2 style="font-size:1rem">${i[0]}</h2><p class="mu" style="margin:0">${i[1]}</p>${i[2]}</div>`).join('');
 }
-otpRender();runTests();$('ba').click();
+otpRender();
